@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Profile</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+        /* Reset some default form styles */
+        form {
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Style form container */
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Style form headings */
+        h2 {
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        /* Style form inputs */
+        input[type="text"],
+        input[type="email"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        /* Style form buttons */
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Style delete button */
+        .delete-form {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ profile_form.as_p }}
+            <h2>Experience</h2>
+            {{ experience_formset.management_form }}
+            {% for form in experience_formset %}
+                {{ form.as_p }}
+            {% endfor %}
+            <h2>Language</h2>
+            {{ language_formset.management_form }}
+            {% for form in language_formset %}
+                {{ form.as_p }}
+            {% endfor %}
+            <h2>Additional Skills</h2>
+            {{ additional_skill_formset.management_form }}
+            {% for form in additional_skill_formset %}
+                {{ form.as_p }}
+            {% endfor %}
+            <h2>Skills</h2>
+            <div id="skills">
+                {{ skill_formset.management_form }}
+                {% for form in skill_formset %}
+                    <div class="skill-form">
+                        {{ form.as_p }}
+                        <button type="button" class="delete-form">Delete</button>
+                    </div>
+                {% endfor %}
+            </div>
+            <button type="button" id="add-skill">Add Skill</button>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#add-skill').click(function() {
+                var formCount = parseInt($('#id_skills-TOTAL_FORMS').val());
+                var row = $('.skill-form:last').clone(true).get(0);
+                $(row).removeAttr('id').insertAfter('.skill-form:last');
+                $(row).find('input').each(function() {
+                    var id = $(this).attr('id').replace('-' + (formCount-1) + '-', '-' + formCount + '-');
+                    $(this).attr('id', id);
+                    $(this).val('');
+                });
+                $(row).find('label').each(function() {
+                    var newFor = $(this).attr('for').replace('-' + (formCount-1) + '-', '-' + formCount + '-');
+                    $(this).attr('for', newFor);
+                });
+                $(row).find('.delete-form').click(function() {
+                    deleteForm('skills', this);
+                });
+                $('#id_skills-TOTAL_FORMS').val(formCount + 1);
+                return false;
+            });
+            $('.delete-form').click(function() {
+                deleteForm('skills', this);
+            });
+        });
+
+        function deleteForm(prefix, btn) {
+            var totalForms = $('#id_' + prefix + '-TOTAL_FORMS');
+            var currentFormCount = parseInt(totalForms.val());
+            if (currentFormCount > 1) {
+                $(btn).parents('.skill-form').remove();
+                var forms = $('.skill-form');
+                totalForms.val(forms.length);
+                for (var i=0; i<forms.length; i++) {
+                    $(forms.get(i)).find('input, select').each(function() {
+                        updateElementIndex(this, prefix, i);
+                    });
+                }
+            }
+            return false;
+        }
+
+        function updateElementIndex(el, prefix, index) {
+            var id_regex = new RegExp('(' + prefix + '-\\d+)');
+            var replacement = prefix + '-' + index;
+            if ($(el).attr("for")) $(el).attr("for", $(el).attr("for").replace(id_regex, replacement));
+            if (el.id) el.id = el.id.replace(id_regex, replacement);
+            if (el.name) el.name = el.name.replace(id_regex, replacement);
+        }
+    </script>
+</body>
+</html>

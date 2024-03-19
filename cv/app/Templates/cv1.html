@@ -1,0 +1,165 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My CV</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-image: url('{% static 'app/images/gr5.jpg' %}');
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .cv-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 800px;
+            display: flex;
+        }
+
+        .left-section {
+            flex: 1;
+            text-align: center;
+        }
+
+        .profile-image {
+            width: 150px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+        }
+
+        .name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .contact-info {
+            color: #555;
+        }
+
+        .right-section {
+            flex: 2;
+            padding-left: 30px;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .experience-item {
+            margin-bottom: 20px;
+        }
+
+        .experience-item h3 {
+            color: #333;
+        }
+
+        .experience-item p {
+            color: #555;
+        }
+
+        .skills-section {
+            margin-top: 20px;
+        }
+
+        .skills-item {
+            margin-bottom: 10px;
+        }
+
+        .skill-progress {
+            width: 100%;
+            height: 20px;
+            background-color: #eee;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+
+        .skill-bar {
+            height: 100%;
+            background-color: #3498db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .skill-text {
+            color: #fff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="cv-container">
+        <div class="left-section">
+            <img src="{{ profile.profile_image.url }}" alt="Profile Image" class="profile-image">
+            <div class="name">{{ profile.name }}</div>
+            <div class="contact-info">
+                Email: {{ profile.email }}<br>
+                Phone: {{ profile.phone }}<br>
+                Address: {{ profile.address }}
+            </div>
+            <h2>Skills</h2>
+            <div class="skills-section">
+                {% for skill in skills %}
+                <div class="skills-item">
+                    <h3>{{ skill.skill_name }}</h3>
+                    <div class="skill-progress">
+                        <div class="skill-bar" style="width: {{ skill.skill_level }}%;">
+                            <span class="skill-text">{{ skill.skill_level }}%</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% for form in skill_formset %}
+                <div class="skills-item">
+                    <h3>{{ form.skill_name.value }}</h3>
+                    <div class="skill-progress">
+                        <div class="skill-bar" style="width: {{ form.skill_level.value }}%;">
+                            <span class="skill-text">{{ form.skill_level.value }}%</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="right-section">
+            <h2>Experience</h2>
+            {% for experience in experiences %}
+            <div class="experience-item">
+                <h3>{{ experience.title }}</h3>
+                <p>{{ experience.description }} | {{ experience.date_range }}</p>
+            </div>
+            {% endfor %}
+            <h2>Language</h2>
+            {% for language in languages %}
+            <div class="experience-item">
+                <h3>{{ language.name }}</h3>
+                <p>{{ language.level }}</p>
+            </div>
+            {% endfor %}
+            <h2>Additional Skills</h2>
+            <div class="skills-section">
+                {% for skill in additional_skills %}
+                <div class="skills-item">
+                    <h3>{{ skill.skill_name }}</h3>
+                    <p>{{ skill.description }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
